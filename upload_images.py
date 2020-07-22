@@ -1,4 +1,3 @@
-import requests
 import csv
 import re
 import credentials
