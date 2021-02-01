@@ -10,7 +10,9 @@ from panoptes_client import Panoptes, Project, SubjectSet, Subject
 subject_data_file = 'WO399_11Jun2020-trunc.tsv'
 subject_file_list = 'wo_399_file_list.txt'
 subject_file_root = credentials.subject_file_root
-subject_file_old_root_re = re.compile(credentials.subject_file_old_root)
+subject_file_old_root_re = ''
+if credentials.subject_file_old_root != '':
+    subject_file_old_root_re = re.compile(credentials.subject_file_old_root)
 file_inventory = defaultdict(list)
 
 project_id = 11982
@@ -36,12 +38,11 @@ def create_subject_set(docref,name):
 with open(subject_file_list,'r') as f:
     print("Reading the list of files on the filer")
     for row in f:
-        print(row)
         piece_match = file_path_extraction_re.search(row)
         piece = piece_match.group(1)
-        filepath = subject_file_old_root_re.sub(subject_file_root)
-        filepath = re.sub('\\','/',filepath)
-        print("Path after first substitution:"+filepath)
+        if subject_file_old_root_re != '':
+            filepath = subject_file_old_root_re.sub(subject_file_root,row)
+            filepath = re.sub('\\\\','/',filepath)
         file_inventory[piece].append(row.rstrip())
 print(str(len(file_inventory)) + " pieces loaded from subject_file_list")
 
