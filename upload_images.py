@@ -40,10 +40,11 @@ with open(subject_file_list,'r') as f:
     for row in f:
         piece_match = file_path_extraction_re.search(row)
         piece = piece_match.group(1)
+        filepath = row
         if subject_file_old_root_re != '':
-            filepath = subject_file_old_root_re.sub(subject_file_root,row)
+            filepath = subject_file_old_root_re.sub(subject_file_root,filepath)
             filepath = re.sub('\\\\','/',filepath)
-        file_inventory[piece].append(row.rstrip())
+        file_inventory[piece].append(filepath.rstrip())
 print(str(len(file_inventory)) + " pieces loaded from subject_file_list")
 
 with open(subject_data_file,'r') as f:
