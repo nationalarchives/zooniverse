@@ -57,21 +57,22 @@ with open(subject_data_file,'r') as f:
         match = piece_ref_re.match(docref)
         if match:
             subject_set = create_subject_set(docref,name)
-            # Now scan the file_inventory dict for the files that make up this subject set
-            new_subjects = list()
-            for filename in file_inventory[match.group(1)]:
-                start_time = time.time()
-                file_size = os.stat(filename).st_size
-                print("Processing "+filename+" ("+str(file_size)+")")
-                subject = Subject()
-                subject.links.project = project
-                subject.add_location(filename)
-                print("Uploading "+filename)
-                subject.save()
-                new_subjects.append(subject)
-                elapsed_time = time.time() - start_time
-                throughput = file_size / elapsed_time
-                print("Elapsed time: "+str(elapsed_time)+"s ("+str(int(throughput))+"/s)")
-            subject_set.add(new_subjects)
+            with Subject.async_saves():
+                # Now scan the file_inventory dict for the files that make up this subject set
+                new_subjects = list()
+                for filename in file_inventory[match.group(1)]:
+                    start_time = time.time()
+                    file_size = os.stat(filename).st_size
+                    print("Processing "+filename+" ("+str(file_size)+")")
+                    subject = Subject()
+                    subject.links.project = project
+                    subject.add_location(filename)
+                    print("Uploading "+filename)
+                    subject.save()
+                    new_subjects.append(subject)
+                    elapsed_time = time.time() - start_time
+                    throughput = file_size / elapsed_time
+                    print("Elapsed time: "+str(elapsed_time)+"s ("+str(int(throughput))+"/s)")
+                subject_set.add(new_subjects)
         # else:
         #     raise("Unable to extract a piece reference from "+docref)
